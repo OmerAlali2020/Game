@@ -55,6 +55,7 @@ export default function Page() {
   const [score, setScore] = useState(0);
   const [status, setStatus] = useState<GameStatus>("idle");
   const [bgColor, setBgColor] = useState("#A7F3D0");
+  const [playerImageMissing, setPlayerImageMissing] = useState(false);
 
   const maxX = useMemo(() => Math.max(0, size.width - PLAYER_SIZE), [size.width]);
 
@@ -79,6 +80,7 @@ export default function Page() {
     setPlayerX(center);
     setGameScore(0);
     setBgColor("#A7F3D0");
+    setPlayerImageMissing(false);
     setGameStatus("running");
   }, [setGameScore, setGameStatus, size.width]);
 
@@ -285,18 +287,34 @@ export default function Page() {
         onMouseDown={(event) => handleTap(event.clientX)}
         onTouchStart={(event) => handleTap(event.touches[0]?.clientX ?? 0)}
       >
-        <img
-          src="/player.png"
-          alt="Player"
-          draggable={false}
-          className="pointer-events-none absolute select-none"
-          style={{
-            left: playerX,
-            width: PLAYER_SIZE,
-            height: PLAYER_SIZE,
-            bottom: PLAYER_BOTTOM,
-          }}
-        />
+        {!playerImageMissing ? (
+          <img
+            src="/player.png"
+            alt="Player"
+            draggable={false}
+            onError={() => setPlayerImageMissing(true)}
+            className="pointer-events-none absolute select-none"
+            style={{
+              left: playerX,
+              width: PLAYER_SIZE,
+              height: PLAYER_SIZE,
+              bottom: PLAYER_BOTTOM,
+            }}
+          />
+        ) : (
+          <div
+            aria-label="Player fallback"
+            className="pointer-events-none absolute flex select-none items-center justify-center text-5xl"
+            style={{
+              left: playerX,
+              width: PLAYER_SIZE,
+              height: PLAYER_SIZE,
+              bottom: PLAYER_BOTTOM,
+            }}
+          >
+            🧒
+          </div>
+        )}
 
         {objects.map((obj) => (
           <div
